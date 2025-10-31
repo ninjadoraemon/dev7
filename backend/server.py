@@ -432,7 +432,6 @@ async def clear_cart(current_user: dict = Depends(get_current_user)):
 @api_router.post("/orders/create")
 async def create_order(
     request: Request,
-    order_request: Optional[OrderCreateRequest] = None,
     current_user: Optional[dict] = Depends(get_current_user_flexible)
 ):
     """
@@ -442,6 +441,15 @@ async def create_order(
     """
     user = None
     cart_items = []
+    
+    # Try to get request body for Clerk users
+    order_request = None
+    try:
+        body = await request.json()
+        if body:
+            order_request = OrderCreateRequest(**body)
+    except:
+        pass
     
     # Determine user and cart source
     if current_user:
