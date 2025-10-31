@@ -508,6 +508,7 @@ async def create_order(
 
 @api_router.post("/orders/verify")
 async def verify_payment(
+    request: Request,
     verification: PaymentVerification,
     current_user: Optional[dict] = Depends(get_current_user_flexible)
 ):
