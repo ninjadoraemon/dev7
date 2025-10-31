@@ -429,25 +429,55 @@ async def clear_cart(current_user: dict = Depends(get_current_user)):
 
 # Payment & Order Routes
 @api_router.post("/orders/create")
-async def create_order(current_user: dict = Depends(get_current_user)):
-    # Get cart
-    cart = await db.carts.find_one({"user_id": current_user['id']})
-    if not cart or not cart.get('items'):
-        raise HTTPException(status_code=400, detail="Cart is empty")
+async def create_order(
+    order_request: OrderCreateRequest = None,
+    current_user: Optional[dict] = Depends(get_current_user_flexible)
+):
+    """
+    Create order for both JWT and Clerk authenticated users.
+    For Clerk users: Provide clerk_id and cart_items in request body
+    For JWT users: Cart is fetched from database
+    """
+    user = None
+    cart_items = []
+    
+    # Determine user and cart source
+    if current_user:
+        # JWT authenticated user
+        user = current_user
+        cart = await db.carts.find_one({"user_id": user['id']})
+        if not cart or not cart.get('items'):
+            raise HTTPException(status_code=400, detail="Cart is empty")
+        cart_items = cart['items']
+    elif order_request and order_request.clerk_id:
+        # Clerk authenticated user
+        user = await db.users.find_one({"clerk_id": order_request.clerk_id}, {"_id": 0})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        if not order_request.cart_items:
+            raise HTTPException(status_code=400, detail="Cart is empty")
+        cart_items = order_request.cart_items
+    else:
+        raise HTTPException(status_code=401, detail="Authentication required")
     
     # Calculate total and get product details
     items = []
     total = 0
-    for item in cart['items']:
-        product = await db.products.find_one({"id": item['product_id']}, {"_id": 0})
+    for item in cart_items:
+        product_id = item.get('product_id') or item.get('id')
+        quantity = item.get('quantity', 1)
+        product = await db.products.find_one({"id": product_id}, {"_id": 0})
         if product:
             items.append({
                 "product_id": product['id'],
                 "name": product['name'],
                 "price": product['price'],
-                "quantity": item['quantity']
+                "quantity": quantity
             })
-            total += product['price'] * item['quantity']
+            total += product['price'] * quantity
+    
+    if not items:
+        raise HTTPException(status_code=400, detail="No valid items in cart")
     
     # Create Razorpay order
     razorpay_order = razorpay_client.order.create({
@@ -458,7 +488,7 @@ async def create_order(current_user: dict = Depends(get_current_user)):
     
     # Create order in database
     order = Order(
-        user_id=current_user['id'],
+        user_id=user['id'],
         items=items,
         total=total,
         razorpay_order_id=razorpay_order['id']
