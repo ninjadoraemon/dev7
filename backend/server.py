@@ -187,6 +187,32 @@ async def get_admin_user(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Admin access required")
     return current_user
 
+async def get_current_user_flexible(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    request: Request = None
+):
+    """
+    Flexible authentication that supports both JWT and Clerk users.
+    For JWT: Pass token in Authorization header
+    For Clerk: Pass clerk_id in request body or query params
+    """
+    if credentials:
+        # Try JWT authentication first
+        try:
+            token = credentials.credentials
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            user_id: str = payload.get("sub")
+            if user_id:
+                user = await db.users.find_one({"id": user_id}, {"_id": 0})
+                if user:
+                    return user
+        except (ExpiredSignatureError, InvalidTokenError):
+            pass
+    
+    # If JWT failed or not provided, this will be handled at endpoint level
+    # where clerk_id can be extracted from request body
+    return None
+
 # Auth Routes
 @api_router.post("/auth/register")
 async def register(user_data: UserRegister):
