@@ -238,10 +238,25 @@ frontend:
         agent: "main"
         comment: "Course products show video player at top with chapters. Software products show demo video below image. Free products display FREE badge. Better UI with category badges and icons."
 
+  - task: "Clerk user checkout with payment processing"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "USER REPORTED: Payment process shows circular loading but doesn't resolve. No success/failure confirmation displayed. Error message 'Clerk checkout coming soon!' blocks Clerk users from checkout."
+      - working: "NA"
+        agent: "main"
+        comment: "FIXED: Removed early return blocking Clerk users. Implemented complete checkout flow for both Clerk and JWT users. Added isCheckoutLoading state with animated spinner. For Clerk users: sends cart_items and clerk_id in request body. Handles Razorpay payment flow with proper error handling. On success: shows success toast, clears localStorage cart, redirects to dashboard. On failure: shows user-friendly error messages. Added payment cancellation handling. Checkout button shows loading state and is disabled during processing."
+
 metadata:
   created_by: "main_agent"
-  version: "2.0"
-  test_sequence: 2
+  version: "3.0"
+  test_sequence: 3
   run_ui: false
 
 test_plan:
