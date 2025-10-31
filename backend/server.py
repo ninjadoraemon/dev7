@@ -517,13 +517,14 @@ async def create_order(request: Request):
 @api_router.post("/orders/verify")
 async def verify_payment(
     request: Request,
-    verification: PaymentVerification,
-    current_user: Optional[dict] = Depends(get_current_user_flexible)
+    verification: PaymentVerification
 ):
     """
     Verify payment for both JWT and Clerk authenticated users.
     For Clerk users: Provide clerk_id in request body
     """
+    # Try to get JWT user first
+    current_user = await get_current_user_flexible(request)
     try:
         # Verify signature
         razorpay_client.utility.verify_payment_signature({
