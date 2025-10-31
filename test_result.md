@@ -261,13 +261,15 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Clerk user checkout with payment processing"
+    - "Clerk user payment processing"
     - "Cart duplicate prevention"
     - "Added to cart popup notification"
     - "Clerk authentication integration"
     - "Advanced video player component"
     - "Demo course distribution"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
   completed_tasks:
     - "Product creation with file uploads (image + download file)"
