@@ -188,8 +188,8 @@ async def get_admin_user(current_user: dict = Depends(get_current_user)):
     return current_user
 
 async def get_current_user_flexible(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
-    request: Request = None
+    request: Request,
+    credentials: Optional[HTTPAuthorizationCredentials] = None
 ):
     """
     Flexible authentication that supports both JWT and Clerk users.
