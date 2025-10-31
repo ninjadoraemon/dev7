@@ -135,6 +135,11 @@ class PaymentVerification(BaseModel):
     razorpay_payment_id: str
     razorpay_signature: str
     order_id: str
+    clerk_id: Optional[str] = None
+
+class OrderCreateRequest(BaseModel):
+    clerk_id: Optional[str] = None
+    cart_items: Optional[List[dict]] = None
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
