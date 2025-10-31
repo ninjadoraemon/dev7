@@ -52,7 +52,7 @@ class ClerkPaymentTester:
         """Find a Clerk user from the database"""
         print("🔍 Finding Clerk user in database...")
         
-        if not self.db:
+        if self.db is None:
             print("   ❌ No database connection")
             return False
         
