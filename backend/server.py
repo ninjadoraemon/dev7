@@ -196,10 +196,11 @@ async def get_current_user_flexible(
     For JWT: Pass token in Authorization header
     For Clerk: Pass clerk_id in request body or query params
     """
-    if credentials:
-        # Try JWT authentication first
+    # Try to get Authorization header manually
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
         try:
-            token = credentials.credentials
+            token = auth_header.split(" ")[1]
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             user_id: str = payload.get("sub")
             if user_id:
