@@ -115,6 +115,36 @@ const AppContent = () => {
 
 const Header = ({ user, clerkUser, logout }) => {
   const navigate = useNavigate();
+  const [cartCount, setCartCount] = useState(0);
+
+  // Fetch cart count when user is authenticated
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      try {
+        if (clerkUser) {
+          const clerkCart = JSON.parse(localStorage.getItem(`clerk_cart_${clerkUser.id}`) || '[]');
+          setCartCount(clerkCart.length);
+        } else if (user && user.role !== 'admin') {
+          const token = localStorage.getItem('token');
+          if (token) {
+            const response = await axios.get(`${API}/cart`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            setCartCount(response.data.items?.length || 0);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching cart count:', error);
+      }
+    };
+
+    fetchCartCount();
+    
+    // Set up interval to update cart count periodically
+    const interval = setInterval(fetchCartCount, 2000);
+    
+    return () => clearInterval(interval);
+  }, [clerkUser, user]);
 
   return (
     <motion.header
@@ -140,9 +170,14 @@ const Header = ({ user, clerkUser, logout }) => {
           
           {/* Clerk Authentication for Regular Users */}
           <SignedIn>
-            <Link to="/cart" data-testid="cart-nav-link">
+            <Link to="/cart" data-testid="cart-nav-link" className="relative">
               <Button variant="ghost" size="sm">
                 <ShoppingCart className="w-4 h-4" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
               </Button>
             </Link>
             <Link to="/dashboard" data-testid="dashboard-nav-link">
