@@ -190,6 +190,30 @@ backend:
         comment: "✅ TESTED: POST /api/auth/register creates new user and automatically adds demo course (12e942d3-1091-43f0-b22c-33508096276b) to purchased_products. GET /api/auth/me confirms demo course is present in user's purchased_products array. Auto-distribution working perfectly."
 
 frontend:
+  - task: "Free products checkout without payment"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Modified CartPage checkout() function to detect if all products are free (price = 0). If all free, calls /api/orders/claim-free endpoint instead of Razorpay payment flow. Shows success message and redirects to dashboard. Only proceeds with Razorpay for paid products. Works for both JWT and Clerk users."
+
+  - task: "Cart count badge on cart icon"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added cart count badge to Header component. Fetches cart count from localStorage (Clerk users) or backend API (JWT users). Displays red circular badge with item count on top-right of cart icon. Updates every 2 seconds automatically. Badge only shows when cart has items."
+
   - task: "Clerk authentication integration"
     implemented: true
     working: "NA"
