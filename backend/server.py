@@ -970,9 +970,8 @@ async def seed_admin():
 @api_router.post("/admin/fix-download-links")
 async def fix_download_links(admin_user: dict = Depends(get_admin_user)):
     """
-    Fix existing product download links by replacing /image/ with /raw/ in Cloudinary URLs.
-    This is a temporary fix for products uploaded before the resource_type fix.
-    Note: Admin should re-upload files properly for permanent fix.
+    Revert download links back to /image/upload/ path since files exist there.
+    The proxy endpoint /api/download/{product_id} will handle serving them.
     """
     try:
         products = await db.products.find({}, {"_id": 0}).to_list(1000)
@@ -980,9 +979,9 @@ async def fix_download_links(admin_user: dict = Depends(get_admin_user)):
         
         for product in products:
             download_link = product.get('download_link', '')
-            if download_link and '/image/upload/' in download_link:
-                # Replace /image/upload/ with /raw/upload/
-                new_link = download_link.replace('/image/upload/', '/raw/upload/')
+            if download_link and '/raw/upload/' in download_link:
+                # Revert back to /image/upload/ where files actually exist
+                new_link = download_link.replace('/raw/upload/', '/image/upload/')
                 await db.products.update_one(
                     {"id": product['id']},
                     {"$set": {"download_link": new_link}}
@@ -990,8 +989,8 @@ async def fix_download_links(admin_user: dict = Depends(get_admin_user)):
                 fixed_count += 1
         
         return {
-            "message": f"Fixed {fixed_count} download links",
-            "note": "If downloads still fail, please re-upload the files through admin panel"
+            "message": f"Reverted {fixed_count} download links to original URLs",
+            "note": "Files will be served through proxy endpoint /api/download/{product_id}"
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fix links: {str(e)}")
