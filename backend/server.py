@@ -700,7 +700,7 @@ async def download_product(product_id: str):
     Fetches from Cloudinary and serves directly to bypass access restrictions.
     """
     import httpx
-    from fastapi.responses import StreamingResponse
+    from fastapi.responses import StreamingResponse, Response
     
     try:
         # Get product
@@ -716,28 +716,50 @@ async def download_product(product_id: str):
         if '/raw/upload/' in download_url:
             download_url = download_url.replace('/raw/upload/', '/image/upload/')
         
-        # Fetch the file from Cloudinary
-        async with httpx.AsyncClient() as client:
-            response = await client.get(download_url)
-            
-            if response.status_code != 200:
-                raise HTTPException(
-                    status_code=response.status_code,
-                    detail=f"Failed to fetch file from storage"
-                )
-            
-            # Determine filename from URL or product name
-            filename = product.get('name', 'download').replace(' ', '_') + '.pdf'
-            
-            # Stream the file back to user
-            return StreamingResponse(
-                iter([response.content]),
-                media_type='application/pdf',
-                headers={
-                    'Content-Disposition': f'attachment; filename="{filename}"',
-                    'Content-Length': str(len(response.content))
-                }
-            )
+        # Try to use Cloudinary SDK to get signed URL
+        try:
+            # Extract public_id from URL
+            parts = download_url.split('/upload/')
+            if len(parts) == 2:
+                public_id_with_version = parts[1]
+                public_id_parts = public_id_with_version.split('/', 1)
+                if len(public_id_parts) == 2:
+                    full_public_id = public_id_parts[1]
+                    
+                    # Generate authenticated/signed URL
+                    signed_url = cloudinary.utils.cloudinary_url(
+                        full_public_id,
+                        resource_type='image',
+                        type='upload',
+                        sign_url=True,
+                        secure=True
+                    )[0]
+                    
+                    # Fetch using signed URL
+                    async with httpx.AsyncClient() as client:
+                        response = await client.get(signed_url, follow_redirects=True)
+                        
+                        if response.status_code == 200:
+                            # Determine filename
+                            filename = product.get('name', 'download').replace(' ', '_') + '.pdf'
+                            
+                            # Return the PDF content
+                            return Response(
+                                content=response.content,
+                                media_type='application/pdf',
+                                headers={
+                                    'Content-Disposition': f'attachment; filename="{filename}"',
+                                    'Content-Length': str(len(response.content))
+                                }
+                            )
+        except Exception as e:
+            print(f"Signed URL attempt failed: {e}")
+        
+        # If signed URL fails, return error
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to access file. Please contact admin to re-upload the product file."
+        )
     except HTTPException:
         raise
     except Exception as e:
