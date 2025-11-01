@@ -297,6 +297,8 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Free products checkout without payment"
+    - "Cart count badge on cart icon"
     - "Clerk user checkout with payment processing"
     - "Clerk user payment processing"
     - "Cart duplicate prevention"
