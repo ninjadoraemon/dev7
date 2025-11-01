@@ -951,6 +951,53 @@ async def distribute_demo_course(admin_user: dict = Depends(get_admin_user)):
         "users_updated": result.modified_count
     }
 
+@api_router.post("/admin/make-downloads-public")
+async def make_downloads_public(admin_user: dict = Depends(get_admin_user)):
+    """
+    Make existing download files public in Cloudinary by updating their access_mode.
+    This should fix the 401 Unauthorized errors for existing files.
+    """
+    try:
+        products = await db.products.find({}, {"_id": 0}).to_list(1000)
+        updated_count = 0
+        errors = []
+        
+        for product in products:
+            download_link = product.get('download_link', '')
+            if not download_link or 'cloudinary.com' not in download_link:
+                continue
+            
+            try:
+                # Extract public_id from Cloudinary URL
+                # URL format: https://res.cloudinary.com/{cloud_name}/{resource_type}/upload/v{version}/{public_id}
+                parts = download_link.split('/upload/')
+                if len(parts) == 2:
+                    public_id_with_version = parts[1]
+                    # Remove version number and get public_id
+                    public_id_parts = public_id_with_version.split('/', 1)
+                    if len(public_id_parts) == 2:
+                        public_id = public_id_parts[1].rsplit('.', 1)[0]  # Remove extension
+                        
+                        # Determine resource type from URL
+                        resource_type = 'image' if '/image/upload/' in download_link else 'raw'
+                        
+                        # Update access mode to public
+                        cloudinary.api.update(
+                            public_id,
+                            access_mode='public',
+                            resource_type=resource_type
+                        )
+                        updated_count += 1
+            except Exception as e:
+                errors.append(f"{product.get('name', 'Unknown')}: {str(e)}")
+        
+        return {
+            "message": f"Updated {updated_count} files to public access",
+            "errors": errors if errors else None
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update files: {str(e)}")
+
 @api_router.post("/admin/seed")
 async def seed_admin():
     """One-time endpoint to create admin user"""
