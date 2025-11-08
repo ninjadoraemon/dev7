@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AnoAI from './components/ui/animated-shader-background'
 import { BrowserRouter, Routes, Route, Link, useNavigate, useParams } from 'react-router-dom';
 import { ClerkProvider, SignIn, SignUp, UserButton, useUser, SignedIn, SignedOut } from '@clerk/clerk-react';
 import axios from 'axios';
