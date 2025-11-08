@@ -292,34 +292,49 @@ const HomePage = () => {
   return (
     <div>
       {/* Hero Section */}
+      <div className="relative w-full h-screen overflow-hidden bg-black">
+      {/* 🔮 Shader background */}
+      <div className="absolute inset-0 z-0">
+        <AnoAI />
+      </div>
+
+      {/* 🌟 Foreground content */}
       <motion.section
-        style={{ opacity, scale }}
-        className="container mx-auto px-4 py-20 text-center"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8 }}
+        className="relative z-10 container mx-auto px-4 py-20 text-center flex flex-col items-center justify-center h-full"
         data-testid="hero-section"
       >
         <motion.h1
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-6xl font-bold text-slate-900 mb-6"
+          className="text-6xl font-bold text-white mb-6"
         >
           Premium Digital Products
         </motion.h1>
+
         <motion.p
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto"
+          className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto"
         >
           Discover top-quality software, apps, and courses to elevate your skills and productivity
         </motion.p>
+
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
           <Link to="/products">
-            <Button size="lg" className="text-lg px-8" data-testid="explore-products-button">
+            <Button
+              size="lg"
+              className="text-lg px-8 bg-white text-black hover:bg-gray-200"
+              data-testid="explore-products-button"
+            >
               Explore Products
             </Button>
           </Link>
