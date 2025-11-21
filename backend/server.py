@@ -1071,6 +1071,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",                 # Local development
         "https://dev7.vercel.app",      # Replace with your actual Vercel URL
+        "https://digitalstore-estore.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
