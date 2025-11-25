@@ -22,7 +22,7 @@ const CLERK_PUBLISHABLE_KEY = process.env.REACT_APP_PUBLISHABLE_KEY || 'pk_test_
 
 const App = () => {
   return (
-    <ClerkProvider 
+    <ClerkProvider
       publishableKey={CLERK_PUBLISHABLE_KEY}
       navigate={(to) => window.location.href = to}
     >
@@ -92,7 +92,7 @@ const AppContent = () => {
         {/* Clerk Auth Pages - No Header */}
         <Route path="/signin" element={<ClerkSignInPage />} />
         <Route path="/signup" element={<ClerkSignUpPage />} />
-        
+
         {/* Main App with Header */}
         <Route path="*" element={
           <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -131,14 +131,14 @@ const Header = ({ user, clerkUser, logout }) => {
           <Link to="/products" className="text-slate-600 hover:text-slate-900" data-testid="products-nav-link">
             Products
           </Link>
-          
+
           {/* Admin Panel Link (JWT Admin Only) */}
           {user?.role === 'admin' && (
             <Link to="/admin/dashboard" className="text-slate-600 hover:text-slate-900">
               Admin Panel
             </Link>
           )}
-          
+
           {/* Clerk Authentication for Regular Users */}
           <SignedIn>
             <Link to="/cart" data-testid="cart-nav-link">
@@ -153,7 +153,7 @@ const Header = ({ user, clerkUser, logout }) => {
             </Link>
             <UserButton afterSignOutUrl="/" />
           </SignedIn>
-          
+
           {/* Show login buttons only if not admin JWT user */}
           {!user && (
             <SignedOut>
@@ -192,12 +192,12 @@ const ClerkSignInPage = React.memo(() => {
   }, []);
 
   return (
-    <div 
+    <div
       className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4"
       style={{ minHeight: '100vh', position: 'fixed', width: '100%', top: 0, left: 0 }}
     >
       <div className="w-full max-w-md" style={{ maxWidth: '28rem' }}>
-        <SignIn 
+        <SignIn
           routing="hash"
           signUpUrl="/signup"
           appearance={{
@@ -226,12 +226,12 @@ const ClerkSignUpPage = React.memo(() => {
   }, []);
 
   return (
-    <div 
+    <div
       className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4"
       style={{ minHeight: '100vh', position: 'fixed', width: '100%', top: 0, left: 0 }}
     >
       <div className="w-full max-w-md" style={{ maxWidth: '28rem' }}>
-        <SignUp 
+        <SignUp
           routing="hash"
           signInUrl="/signin"
           appearance={{
@@ -258,55 +258,55 @@ const HomePage = () => {
   return (
     <div>
       <div className="relative w-full h-screen overflow-hidden bg-black">
-      {/* 🔮 Shader background */}
-      <div className="absolute inset-0 z-0">
-        <AnoAI />
-      </div>
+        {/* 🔮 Shader background */}
+        <div className="absolute inset-0 z-0">
+          <AnoAI />
+        </div>
 
-      {/* 🌟 Foreground content */}
-      <motion.section
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8 }}
-        className="relative z-10 container mx-auto px-4 py-20 text-center flex flex-col items-center justify-center h-full"
-        data-testid="hero-section"
-      >
-        <motion.h1
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
+        {/* 🌟 Foreground content */}
+        <motion.section
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="text-6xl font-bold text-white mb-6"
+          className="relative z-10 container mx-auto px-4 py-20 text-center flex flex-col items-center justify-center h-full"
+          data-testid="hero-section"
         >
-          Premium Digital Products
-        </motion.h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-6xl font-bold text-white mb-6"
+          >
+            Premium Digital Products
+          </motion.h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto"
-        >
-          Discover top-quality software, apps, and courses to elevate your skills and productivity
-        </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto"
+          >
+            Discover top-quality software, apps, and courses to elevate your skills and productivity
+          </motion.p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-        >
-          <Link to="/products">
-            <Button
-              size="lg"
-              className="text-lg px-8 bg-white text-black hover:bg-gray-200"
-              data-testid="explore-products-button"
-            >
-              Explore Products
-            </Button>
-          </Link>
-        </motion.div>
-      </motion.section>
-    </div>
-  );
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            <Link to="/products">
+              <Button
+                size="lg"
+                className="text-lg px-8 bg-white text-black hover:bg-gray-200"
+                data-testid="explore-products-button"
+              >
+                Explore Products
+              </Button>
+            </Link>
+          </motion.div>
+        </motion.section>
+      </div>
+      );
 };
 
       {/* Features Section */}
@@ -366,8 +366,8 @@ const AuthPage = ({ setToken, toast }) => {
       toast({ title: isLogin ? 'Login successful!' : 'Account created!' });
       navigate('/products');
     } catch (error) {
-      toast({ 
-        title: 'Error', 
+      toast({
+        title: 'Error',
         description: error.response?.data?.detail || 'Something went wrong',
         variant: 'destructive'
       });
@@ -421,8 +421,8 @@ const AuthPage = ({ setToken, toast }) => {
             </form>
           </CardContent>
           <CardFooter>
-            <Button 
-              variant="link" 
+            <Button
+              variant="link"
               onClick={() => setIsLogin(!isLogin)}
               className="w-full"
               data-testid="toggle-auth-button"
@@ -719,9 +719,9 @@ const ProductDetailPage = ({ clerkUser, user, token, toast }) => {
         {product.video_url && product.category === 'course' && (
           <div className="mb-12">
             <h2 className="text-3xl font-bold mb-6">Course Preview</h2>
-            <AdvancedVideoPlayer 
-              videoUrl={product.video_url} 
-              chapters={product.video_chapters || []} 
+            <AdvancedVideoPlayer
+              videoUrl={product.video_url}
+              chapters={product.video_chapters || []}
             />
           </div>
         )}
@@ -746,9 +746,9 @@ const ProductDetailPage = ({ clerkUser, user, token, toast }) => {
                   <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
                     <Play className="w-5 h-5" /> Demo Video
                   </h3>
-                  <AdvancedVideoPlayer 
-                    videoUrl={product.video_url} 
-                    chapters={product.video_chapters || []} 
+                  <AdvancedVideoPlayer
+                    videoUrl={product.video_url}
+                    chapters={product.video_chapters || []}
                   />
                 </div>
               </div>
@@ -764,7 +764,7 @@ const ProductDetailPage = ({ clerkUser, user, token, toast }) => {
             <p className="text-4xl font-bold mb-6" data-testid="product-price">
               {product.price === 0 ? 'FREE' : `₹${product.price}`}
             </p>
-            
+
             {product.features && product.features.length > 0 && (
               <div className="mb-6">
                 <h3 className="font-semibold mb-3">Features:</h3>
@@ -779,10 +779,10 @@ const ProductDetailPage = ({ clerkUser, user, token, toast }) => {
               </div>
             )}
 
-            <Button 
-              size="lg" 
-              onClick={addToCart} 
-              className="w-full" 
+            <Button
+              size="lg"
+              onClick={addToCart}
+              className="w-full"
               data-testid="add-to-cart-detail-button"
               disabled={isInCart}
             >
@@ -846,16 +846,35 @@ const CartPage = ({ clerkUser, user, token, toast }) => {
   };
 
   const checkout = async () => {
-    if (clerkUser) {
-      sonnerToast.info('Clerk checkout coming soon! For now, admin users can process orders.');
-      return;
-    }
-    
     try {
+      let orderData = {};
+      let headers = {};
+
+      if (clerkUser) {
+        // Prepare cart items for Clerk order
+        const cartItems = cart.items.map(item => ({
+          product_id: item.product.id,
+          quantity: item.quantity
+        }));
+
+        orderData = {
+          clerk_id: clerkUser.id,
+          cart_items: cartItems
+        };
+        // No Authorization header needed for Clerk flow as per backend test
+      } else if (token) {
+        // JWT flow uses token in headers
+        headers = { Authorization: `Bearer ${token}` };
+      } else {
+        sonnerToast.error('Please sign in to checkout');
+        navigate('/signin');
+        return;
+      }
+
       const response = await axios.post(
         `${API}/orders/create`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        orderData,
+        { headers }
       );
 
       const options = {
@@ -875,11 +894,19 @@ const CartPage = ({ clerkUser, user, token, toast }) => {
                 razorpay_signature: razorpayResponse.razorpay_signature,
                 order_id: response.data.order_id
               },
-              { headers: { Authorization: `Bearer ${token}` } }
+              { headers: token ? { Authorization: `Bearer ${token}` } : {} }
             );
+
+            // Clear cart after successful payment
+            if (clerkUser) {
+              localStorage.removeItem(`clerk_cart_${clerkUser.id}`);
+              setCart({ items: [] });
+            }
+
             sonnerToast.success('Payment successful!');
             navigate('/dashboard');
           } catch (error) {
+            console.error('Payment verification error:', error);
             sonnerToast.error('Payment verification failed');
           }
         },
@@ -895,7 +922,8 @@ const CartPage = ({ clerkUser, user, token, toast }) => {
       const razorpay = new window.Razorpay(options);
       razorpay.open();
     } catch (error) {
-      sonnerToast.error('Checkout failed');
+      console.error('Checkout error:', error);
+      sonnerToast.error(error.response?.data?.detail || 'Checkout failed');
     }
   };
 
@@ -999,7 +1027,7 @@ const DashboardPage = ({ clerkUser, user, token }) => {
       navigate('/signin');
       return;
     }
-    
+
     if (clerkUser) {
       // For Clerk users, show demo course
       fetchDemoCourse();
@@ -1158,23 +1186,23 @@ const AdminLogin = ({ setToken, toast }) => {
     try {
       const response = await axios.post(`${API}/auth/login`, formData);
       const userData = response.data.user;
-      
+
       if (userData.role !== 'admin') {
-        toast({ 
-          title: 'Access Denied', 
+        toast({
+          title: 'Access Denied',
           description: 'Admin access required',
           variant: 'destructive'
         });
         return;
       }
-      
+
       localStorage.setItem('token', response.data.token);
       setToken(response.data.token);
       toast({ title: 'Admin login successful!' });
       navigate('/admin/dashboard');
     } catch (error) {
-      toast({ 
-        title: 'Error', 
+      toast({
+        title: 'Error',
         description: error.response?.data?.detail || 'Login failed',
         variant: 'destructive'
       });
@@ -1259,7 +1287,7 @@ const AdminDashboard = ({ user, token, toast }) => {
 
   const deleteProduct = async (productId) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
-    
+
     try {
       await axios.delete(`${API}/admin/products/${productId}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -1434,7 +1462,7 @@ const ProductModal = ({ product, token, toast, onClose, onSuccess }) => {
       const url = product
         ? `${API}/admin/products/${product.id}`
         : `${API}/admin/products`;
-      
+
       const method = product ? 'put' : 'post';
 
       await axios[method](url, formDataToSend, {

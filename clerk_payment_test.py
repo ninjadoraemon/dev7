@@ -14,10 +14,18 @@ from pymongo import MongoClient
 # Get backend URL from frontend .env
 def get_backend_url():
     try:
-        with open('/app/frontend/.env', 'r') as f:
-            for line in f:
-                if line.startswith('REACT_APP_BACKEND_URL='):
-                    return line.split('=', 1)[1].strip()
+        # Try local path first
+        if os.path.exists('frontend/.env'):
+            with open('frontend/.env', 'r') as f:
+                for line in f:
+                    if line.startswith('REACT_APP_BACKEND_URL='):
+                        return line.split('=', 1)[1].strip()
+        # Fallback to container path
+        elif os.path.exists('/app/frontend/.env'):
+            with open('/app/frontend/.env', 'r') as f:
+                for line in f:
+                    if line.startswith('REACT_APP_BACKEND_URL='):
+                        return line.split('=', 1)[1].strip()
     except:
         pass
     return "http://localhost:8001"
@@ -35,14 +43,29 @@ class ClerkPaymentTester:
         
         # MongoDB connection to find Clerk users
         try:
-            with open('/app/backend/.env', 'r') as f:
-                for line in f:
-                    if line.startswith('MONGO_URL='):
-                        mongo_url = line.split('=', 1)[1].strip()
-                        break
+            mongo_url = None
+            # Try local path first
+            if os.path.exists('backend/.env'):
+                with open('backend/.env', 'r') as f:
+                    for line in f:
+                        if line.startswith('MONGO_URL='):
+                            mongo_url = line.split('=', 1)[1].strip()
+                            break
+            # Fallback to container path
+            elif os.path.exists('/app/backend/.env'):
+                with open('/app/backend/.env', 'r') as f:
+                    for line in f:
+                        if line.startswith('MONGO_URL='):
+                            mongo_url = line.split('=', 1)[1].strip()
+                            break
             
-            self.mongo_client = MongoClient(mongo_url)
-            self.db = self.mongo_client['ecommerce_db']
+            if mongo_url:
+                self.mongo_client = MongoClient(mongo_url)
+                self.db = self.mongo_client['ecommerce_db']
+            else:
+                print("⚠️ Could not find MONGO_URL in .env files")
+                self.mongo_client = None
+                self.db = None
         except Exception as e:
             print(f"❌ MongoDB connection failed: {e}")
             self.mongo_client = None
