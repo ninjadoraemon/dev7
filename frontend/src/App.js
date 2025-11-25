@@ -38,6 +38,38 @@ const AppContent = () => {
   const { user: clerkUser, isLoaded } = useUser();
   const [clerkSynced, setClerkSynced] = useState(false);
 
+  // Wrap logout in useCallback to be stable for useEffect dependencies
+  const logout = React.useCallback(() => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem('token');
+    // Also clear Clerk cart if exists
+    if (clerkUser) {
+      localStorage.removeItem(`clerk_cart_${clerkUser.id}`);
+    }
+  }, [clerkUser]);
+
+  // Global Axios Interceptor for 401 Unauthorized
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          // Only logout if we actually have a token that might be invalid
+          if (token) {
+            logout();
+            sonnerToast.error('Session expired. Please sign in again.');
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, [token, logout]);
+
   useEffect(() => {
     if (token) {
       fetchUser();
@@ -74,16 +106,8 @@ const AppContent = () => {
       setUser(response.data);
     } catch (error) {
       console.error('Error fetching user:', error);
-      if (error.response?.status === 401) {
-        logout();
-      }
+      // 401 handled by interceptor now
     }
-  };
-
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('token');
   };
 
   return (
